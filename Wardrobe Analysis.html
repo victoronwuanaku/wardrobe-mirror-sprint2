@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Wardrobe Mirror — Survey Analysis · Sprint 2</title>
+  <title>Wardrobe Mirror: Survey Analysis · Sprint 2</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     :root {
@@ -254,7 +254,7 @@
 
 <!-- EDIT BANNER -->
 <div class="edit-banner">
-  ✎ &nbsp; Edit mode active — click any title, heading or insight text to edit it directly. Press <strong>Save Changes</strong> when done.
+  ✎ &nbsp; Edit mode active: click any title, heading or insight text to edit it directly. Press <strong>Save Changes</strong> when done.
 </div>
 
 <!-- RESET MODAL -->
@@ -272,7 +272,7 @@
 <!-- HEADER -->
 <div class="header">
   <div class="header-eyebrow" data-edit="eyebrow" contenteditable="false">AMFI · Digital Society School · Sprint 2</div>
-  <h1 data-edit="title" contenteditable="false">Wardrobe Mirror — Survey Analysis</h1>
+  <h1 data-edit="title" contenteditable="false">Wardrobe Mirror: Survey Analysis</h1>
   <div class="header-sub" data-edit="subtitle" contenteditable="false">Wardrobe Behaviour & Prototype Engagement · Data collected April 2026</div>
   <div class="stat-bar">
     <div class="stat-item"><div class="num" data-edit="stat1" contenteditable="false">39</div><div class="label" data-edit="stat1label" contenteditable="false">Participants</div></div>
@@ -287,7 +287,7 @@
   <!-- ── SECTION 1 ── -->
   <div class="section-label" data-edit="s1label" contenteditable="false">Section 1 · Garment Lifecycle</div>
   <div class="section-title" data-edit="s1title" contenteditable="false">Ownership & Wear Patterns</div>
-  <div class="section-desc" data-edit="s1desc" contenteditable="false">How participants relate to each of the 13 garment types — from actively worn to discarded or never owned.</div>
+  <div class="section-desc" data-edit="s1desc" contenteditable="false">How participants relate to each of the 13 garment types, from actively worn to discarded or never owned.</div>
 
   <div class="grid-2" style="margin-bottom:20px;">
     <div class="card">
@@ -296,7 +296,7 @@
     </div>
     <div class="card" style="display:flex;flex-direction:column;gap:12px;">
       <div class="card-title" data-edit="ins1title" contenteditable="false">Key Insights</div>
-      <div class="insight" data-edit="ins1a" contenteditable="false"><strong>38%</strong> of all garment interactions are <strong>never-owned</strong> — the largest single category. This is a useful baseline showing which items simply aren't part of participants' wardrobes.</div>
+      <div class="insight" data-edit="ins1a" contenteditable="false"><strong>38%</strong> of all garment interactions are <strong>never-owned</strong>, the largest single category. This is a useful baseline showing which items simply aren't part of participants' wardrobes.</div>
       <div class="insight" data-edit="ins1b" contenteditable="false"><strong>32%</strong> of items are actively worn (<em>wear-often</em>), while <strong>22%</strong> are kept but rarely worn.</div>
       <div class="insight" data-edit="ins1c" contenteditable="false">Only <strong>8%</strong> of items have been discarded, but this likely underrepresents real discard behaviour, discarded items are harder for participants to recall and log.</div>
     </div>
@@ -316,11 +316,11 @@
 
   <div class="grid-2" style="margin-bottom:20px;">
     <div class="card">
-      <div class="card-title" data-edit="chart2title" contenteditable="false">Rarely Worn — by Garment Type</div>
+      <div class="card-title" data-edit="chart2title" contenteditable="false">Rarely Worn by Garment Type</div>
       <div class="chart-wrap"><canvas id="rarelyWornChart"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-title" data-edit="chart3title" contenteditable="false">Discarded — by Garment Type</div>
+      <div class="card-title" data-edit="chart3title" contenteditable="false">Discarded by Garment Type</div>
       <div class="chart-wrap"><canvas id="discardedChart"></canvas></div>
     </div>
   </div>
@@ -383,7 +383,7 @@
   </div>
 
   <div class="card" style="margin-bottom:20px;">
-    <div class="card-title" data-edit="chart10title" contenteditable="false">Question Answer Rates — Owned Items Only (142 records)</div>
+    <div class="card-title" data-edit="chart10title" contenteditable="false">Question Answer Rates: Owned Items Only (142 records)</div>
     <div class="comp-bar-wrap" id="fieldCompletion"></div>
     <div style="margin-top:16px;">
       <div class="insight warn-insight" data-edit="ins4d" contenteditable="false"><strong>Critical data gaps:</strong> Future Plan (2%), Why Discard (2%), Care Instructions (9%), and Repair History (8%) are almost entirely unanswered. These were either not surfaced clearly in the interface or participants skipped them consistently.</div>
@@ -511,7 +511,7 @@ function saveEdits() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedEdits));
     showSaveStatus('All changes saved ✓');
   } catch(e) {
-    showSaveStatus('Could not save — storage unavailable');
+    showSaveStatus('Could not save: storage unavailable');
   }
 }
 

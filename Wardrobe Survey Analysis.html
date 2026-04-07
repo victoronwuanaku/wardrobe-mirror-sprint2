@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wardrobe Mirror — Survey Analysis · Sprint 2</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f5f3ef;
+      --surface: #ffffff;
+      --border: #e8e4dc;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6b6560;
+      --accent: #2d5a3d;
+      --accent-light: #e8f0ea;
+      --accent2: #8b5e3c;
+      --accent3: #4a6fa5;
+      --warn: #c8602e;
+      --warn-light: #fdf0eb;
+      --tag-bg: #f0ede8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* HEADER */
+    .header {
+      background: var(--accent);
+      color: white;
+      padding: 40px 48px 36px;
+    }
+    .header-eyebrow {
+      font-family: 'Arial', sans-serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 10px;
+    }
+    .header h1 {
+      font-size: 28px;
+      font-weight: normal;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+    }
+    .header-sub {
+      font-family: 'Arial', sans-serif;
+      font-size: 13px;
+      opacity: 0.75;
+    }
+    .stat-bar {
+      display: flex;
+      gap: 32px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+    .stat-item { text-align: left; }
+    .stat-item .num {
+      font-size: 32px;
+      font-weight: bold;
+      font-family: 'Arial', sans-serif;
+      letter-spacing: -1px;
+    }
+    .stat-item .label {
+      font-family: 'Arial', sans-serif;
+      font-size: 11px;
+      opacity: 0.65;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* MAIN */
+    .main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 32px 80px;
+    }
+
+    /* SECTION HEADINGS */
+    .section-label {
+      font-family: 'Arial', sans-serif;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: normal;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .section-desc {
+      font-family: 'Arial', sans-serif;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 44px 0 36px;
+    }
+
+    /* GRID */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+    /* CARD */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+    }
+    .card-title {
+      font-family: 'Arial', sans-serif;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .chart-wrap {
+      position: relative;
+      height: 240px;
+    }
+    .chart-wrap-tall {
+      position: relative;
+      height: 300px;
+    }
+
+    /* INSIGHT BOXES */
+    .insight {
+      background: var(--accent-light);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      padding: 14px 16px;
+      font-family: 'Arial', sans-serif;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #1a3328;
+    }
+    .insight + .insight { margin-top: 10px; }
+    .insight strong { font-weight: 700; }
+
+    .warn-insight {
+      background: var(--warn-light);
+      border-left: 3px solid var(--warn);
+      color: #4a1a08;
+    }
+
+    /* HEATMAP TABLE */
+    .heatmap-wrap { overflow-x: auto; }
+    .heatmap {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'Arial', sans-serif;
+      font-size: 12px;
+    }
+    .heatmap th {
+      background: #f8f6f2;
+      padding: 10px 12px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+    .heatmap th:first-child { text-align: left; }
+    .heatmap td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #f0ede8;
+      text-align: center;
+      font-size: 13px;
+    }
+    .heatmap td:first-child {
+      text-align: left;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .heatmap tr:last-child td { border-bottom: none; }
+    .cell-0 { background: #f8f6f2; color: #ccc; }
+    .cell-1 { background: #e8f4ea; color: #2d5a3d; }
+    .cell-2 { background: #c8e6cc; color: #1e4228; }
+    .cell-high { background: #8bc490; color: #12321a; font-weight: 700; }
+    .cell-rare-1 { background: #fef3e2; color: #7a4f10; }
+    .cell-rare-2 { background: #fbd89a; color: #5a3800; }
+    .cell-rare-high { background: #f5a623; color: #2a1800; font-weight: 700; }
+    .cell-disc-1 { background: #fde8e2; color: #7a2210; }
+    .cell-disc-2 { background: #f5b8a8; color: #5a1200; font-weight: 700; }
+
+    /* TAG PILLS */
+    .tag {
+      display: inline-block;
+      background: var(--tag-bg);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-family: 'Arial', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin: 3px;
+      letter-spacing: 0.3px;
+    }
+    .tag.green { background: var(--accent-light); color: var(--accent); }
+    .tag.orange { background: #fef3e2; color: #8b5e00; }
+    .tag.red { background: var(--warn-light); color: var(--warn); }
+
+    /* COMPLETION BAR */
+    .comp-bar-wrap { margin-top: 8px; }
+    .comp-bar-label {
+      font-family: 'Arial', sans-serif;
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .comp-bar-outer {
+      background: #f0ede8;
+      border-radius: 4px;
+      height: 14px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .comp-bar-inner {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    /* FOOTER */
+    .footer {
+      font-family: 'Arial', sans-serif;
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-align: center;
+      padding: 24px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      margin-top: 60px;
+    }
+
+    @media (max-width: 760px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .stat-bar { gap: 20px; }
+      .header { padding: 28px 20px; }
+      .main { padding: 24px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-eyebrow">AMFI · Digital Society School · Sprint 2</div>
+  <h1>Wardrobe Mirror — Survey Analysis</h1>
+  <div class="header-sub">Wardrobe Behaviour & Prototype Engagement · Data collected April 2026</div>
+  <div class="stat-bar">
+    <div class="stat-item"><div class="num">39</div><div class="label">Participants</div></div>
+    <div class="stat-item"><div class="num">230</div><div class="label">Item Records</div></div>
+    <div class="stat-item"><div class="num">13</div><div class="label">Garment Types</div></div>
+    <div class="stat-item"><div class="num">54%</div><div class="label">Full Completions</div></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ── SECTION 1: OWNERSHIP ── -->
+  <div class="section-label">Section 1 · Garment Lifecycle</div>
+  <div class="section-title">Ownership & Wear Patterns</div>
+  <div class="section-desc">How participants relate to each of the 13 garment types — from actively worn to discarded or never owned.</div>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-title">Overall Ownership Distribution</div>
+      <div class="chart-wrap">
+        <canvas id="ownershipChart"></canvas>
+      </div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;">
+      <div class="card-title">Key Insights</div>
+      <div class="insight">
+        <strong>38%</strong> of all garment interactions are <strong>never-owned</strong> — the largest single category. This is a useful baseline showing which items simply aren't part of participants' wardrobes.
+      </div>
+      <div class="insight">
+        <strong>32%</strong> of items are actively worn (<em>wear-often</em>), while <strong>22%</strong> are kept but rarely worn — suggesting significant <strong>wardrobe inertia</strong> in the sample.
+      </div>
+      <div class="insight">
+        Only <strong>8%</strong> of items have been discarded, but this likely underrepresents real discard behaviour — discarded items are harder for participants to recall and log.
+      </div>
+    </div>
+  </div>
+
+  <!-- HEATMAP -->
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-title">Garment × Ownership Heatmap — Count of participants per status</div>
+    <div class="heatmap-wrap">
+      <table class="heatmap">
+        <thead>
+          <tr>
+            <th>Garment</th>
+            <th>✦ Wear Often</th>
+            <th>~ Rarely Wear</th>
+            <th>✕ Discarded</th>
+            <th>○ Never Owned</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="heatmapBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-title">Rarely Worn — by Garment Type</div>
+      <div class="chart-wrap">
+        <canvas id="rarelyWornChart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Discarded — by Garment Type</div>
+      <div class="chart-wrap">
+        <canvas id="discardedChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- ── SECTION 2: ACQUISITION & COST ── -->
+  <div class="section-label">Section 2 · Garment Lifecycle</div>
+  <div class="section-title">Acquisition, Cost & Age</div>
+  <div class="section-desc">How participants acquired their garments, what they paid, and how long they've had them. Based on 142 owned items (wear-often + rarely-wear + discarded).</div>
+
+  <div class="grid-3" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-title">How Garments Were Acquired</div>
+      <div class="chart-wrap">
+        <canvas id="inflowChart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Price Paid</div>
+      <div class="chart-wrap">
+        <canvas id="priceChart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Garment Age</div>
+      <div class="chart-wrap">
+        <canvas id="ageChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;">
+      <div class="card-title">Key Insights</div>
+      <div class="insight">
+        <strong>63%</strong> of owned garments were <strong>bought new</strong>, with secondhand purchase at just 13%. Gifts account for 15%, suggesting social gifting is a significant inflow channel.
+      </div>
+      <div class="insight">
+        Price distribution is relatively <strong>even across brackets</strong> (€1–20 through €100+), suggesting participants represent a range of spending behaviours rather than a single profile.
+      </div>
+      <div class="insight">
+        The majority of owned items are <strong>1–4 years old</strong> (69%). Items older than 5 years are rare — either participants have newer wardrobes, or older items have already been discarded.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Wear Frequency (Actively Worn Items)</div>
+      <div class="chart-wrap-tall">
+        <canvas id="frequencyChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- ── SECTION 3: WHY NOT WORN ── -->
+  <div class="section-label">Section 3 · Garment Lifecycle</div>
+  <div class="section-title">Why Items Go Unworn</div>
+  <div class="section-desc">Reasons given by participants for items in the <em>rarely-wear</em> category (50 items, 35% answer rate).</div>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-title">Reasons for Rarely Wearing</div>
+      <div class="chart-wrap">
+        <canvas id="whyNotWearChart"></canvas>
+      </div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;">
+      <div class="card-title">Interpretation</div>
+      <div class="insight">
+        <strong>Seasonality is the dominant barrier</strong> — 58% of unworn items are simply out-of-season, not permanently abandoned. These items may have high reactivation potential.
+      </div>
+      <div class="insight">
+        <strong>"Forgot"</strong> is the second reason (18%), tied with <em>out-of-style</em>. Forgotten items represent a real design opportunity — a reminder or rediscovery mechanic could reactivate them.
+      </div>
+      <div class="insight">
+        <strong>Fit issues</strong> account for 6% — a smaller but notable category where the item is genuinely no longer usable for its owner. These are strong discard candidates.
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- ── SECTION 4: PROTOTYPE ENGAGEMENT ── -->
+  <div class="section-label">Section 4 · Prototype Performance</div>
+  <div class="section-title">Survey Completion & Data Quality</div>
+  <div class="section-desc">How well the Wardrobe Mirror prototype performed as a data collection tool. 39 participants · 9 garment types per full session.</div>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-title">Completion Distribution</div>
+      <div class="chart-wrap">
+        <canvas id="completionChart"></canvas>
+      </div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;">
+      <div class="card-title">Key Observations</div>
+      <div class="insight">
+        <strong>21 of 39 participants (54%)</strong> completed all 9 garment cards. This is a reasonable rate for a first prototype run, but indicates drop-off is significant.
+      </div>
+      <div class="warn-insight insight">
+        <strong>10 participants completed only 1 item</strong> — a hard drop-off that suggests the entry experience may cause early abandonment before the participant is engaged.
+      </div>
+      <div class="insight">
+        A notable <strong>bimodal distribution</strong>: either participants complete everything or they drop off very early. There is almost no "middle engagement" — suggesting the tool either hooks people or loses them immediately.
+      </div>
+    </div>
+  </div>
+
+  <!-- FIELD COMPLETION -->
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-title">Question Answer Rates — Owned Items Only (142 records)</div>
+    <div class="comp-bar-wrap" id="fieldCompletion"></div>
+    <div style="margin-top:16px;">
+      <div class="insight warn-insight">
+        <strong>Critical data gaps:</strong> Future Plan (2%), Why Discard (2%), Care Instructions (9%), and Repair History (8%) are almost entirely unanswered. These were either not surfaced clearly in the interface or participants skipped them consistently.
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY TAGS -->
+  <hr class="section-divider"/>
+  <div class="section-label">Summary</div>
+  <div class="section-title">What This Data Tells Us</div>
+  <div class="section-desc">High-level takeaways for the Wardrobe Mirror research & design team.</div>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div class="card" style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card-title">Garment Lifecycle Findings</div>
+      <div class="insight"><strong>Seasonal wardrobing is real.</strong> Most rarely-worn items are set aside seasonally — not permanently discarded. Design interventions around seasonal transitions could be high-impact.</div>
+      <div class="insight"><strong>Graduation Robe is the clearest lifecycle case.</strong> High discard rate, short active use, often received as a gift — a textbook single-use garment with low reactivation probability.</div>
+      <div class="insight"><strong>Denim Jacket shows wardrobe inertia.</strong> Owned by nearly everyone, but the most rarely-worn item (10 cases). Participants keep it but don't wear it — a classic "sentimental keep" pattern.</div>
+      <div class="insight"><strong>Black Jeans are the most actively worn.</strong> 17 wear-often vs. 0 rarely-wear — the highest utility/retention ratio of any item. A useful benchmark for high-engagement garments.</div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card-title">Prototype Recommendations</div>
+      <div class="insight warn-insight"><strong>Re-examine the entry flow.</strong> 10/39 participants dropped off after just one garment card — this pattern needs to be understood before scaling data collection.</div>
+      <div class="insight warn-insight"><strong>Future Plan, Care, and Repair questions are broken.</strong> &lt;10% answer rates suggest these are either hidden, confusing, or feel too effortful within the game flow. Redesign or reposition these questions.</div>
+      <div class="insight"><strong>Frequency data is useful but partial.</strong> 51% response rate for wear frequency — better than most other fields, but still suggests participants skip it when the item is rarely worn (no frequency to report).</div>
+      <div class="insight"><strong>The core data (price, age, inflow) is solid.</strong> 100% completion on these three fields confirms the main garment card mechanics work well. Build on this foundation.</div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="footer">
+  Wardrobe Mirror · Wardrobe Survey Analysis · Sprint 2 · AMFI / Digital Society School · April 2026
+</div>
+
+<script>
+// ─── DATA ───
+const ownershipData = {
+  labels: ['Wear Often', 'Rarely Wear', 'Discarded', 'Never Owned'],
+  values: [73, 50, 19, 88],
+  colors: ['#2d5a3d', '#f5a623', '#c8602e', '#c2bdb6']
+};
+
+const heatmapData = [
+  { name: 'Black Jeans',         wearOften: 17, rarelyWear: 0,  discarded: 2, neverOwned: 6 },
+  { name: 'White Sneakers',      wearOften: 14, rarelyWear: 7,  discarded: 0, neverOwned: 4 },
+  { name: 'Plain T-Shirt',       wearOften: 11, rarelyWear: 6,  discarded: 5, neverOwned: 8 },
+  { name: 'Denim Jacket',        wearOften: 7,  rarelyWear: 10, discarded: 2, neverOwned: 7 },
+  { name: 'Vintage Scarf',       wearOften: 8,  rarelyWear: 8,  discarded: 1, neverOwned: 9 },
+  { name: 'Leather Boots',       wearOften: 6,  rarelyWear: 3,  discarded: 0, neverOwned: 14 },
+  { name: 'Tailored Blazer',     wearOften: 5,  rarelyWear: 8,  discarded: 4, neverOwned: 10 },
+  { name: 'Graduation Robe',     wearOften: 1,  rarelyWear: 4,  discarded: 4, neverOwned: 10 },
+  { name: 'Traditional Clothes', wearOften: 2,  rarelyWear: 4,  discarded: 0, neverOwned: 14 },
+  { name: 'Sports Shorts',       wearOften: 1,  rarelyWear: 0,  discarded: 0, neverOwned: 2 },
+  { name: 'White T-Shirt',       wearOften: 1,  rarelyWear: 0,  discarded: 0, neverOwned: 1 },
+  { name: 'Leather Bag',         wearOften: 0,  rarelyWear: 0,  discarded: 1, neverOwned: 1 },
+  { name: 'Graphic T-Shirt',     wearOften: 0,  rarelyWear: 0,  discarded: 0, neverOwned: 2 },
+];
+
+const inflowData = {
+  labels: ['Bought New', 'Gift', 'Bought Secondhand', 'Borrowed / Shared', 'Made It'],
+  values: [90, 22, 19, 6, 5],
+  colors: ['#2d5a3d', '#4a6fa5', '#8b5e3c', '#7a9e87', '#c8a87a']
+};
+
+const priceData = {
+  labels: ['€1–20', '€21–50', '€51–100', '€100+', 'Free'],
+  values: [37, 35, 31, 32, 7],
+  colors: ['#c8e6cc', '#8bc490', '#2d5a3d', '#1e4228', '#aad4ae']
+};
+
+const ageData = {
+  labels: ['< 1 year', '1–2 years', '3–4 years', '5–6 years', '7+ years'],
+  values: [17, 53, 46, 12, 14],
+  colors: ['#e8f4ea', '#8bc490', '#2d5a3d', '#1e4228', '#4a2e1a']
+};
+
+const frequencyData = {
+  labels: ['Every Week', 'Once a Month', 'Once a Season'],
+  values: [50, 14, 9],
+  colors: ['#2d5a3d', '#7a9e87', '#c8e6cc']
+};
+
+const whyNotWearData = {
+  labels: ['Seasonal', 'Out of Style', 'Forgot About It', "Doesn't Fit"],
+  values: [29, 9, 9, 3],
+  colors: ['#4a6fa5', '#f5a623', '#8b5e3c', '#c8602e']
+};
+
+const rarelyWornData = {
+  labels: ['Denim Jacket', 'Vintage Scarf', 'Tailored Blazer', 'White Sneakers', 'Plain T-Shirt', 'Graduation Robe', 'Traditional Clothes', 'Leather Boots'],
+  values: [10, 8, 8, 7, 6, 4, 4, 3],
+};
+
+const discardedData = {
+  labels: ['Plain T-Shirt', 'Graduation Robe', 'Tailored Blazer', 'Denim Jacket', 'Black Jeans', 'Vintage Scarf', 'Leather Bag'],
+  values: [5, 4, 4, 2, 2, 1, 1],
+};
+
+const completionData = {
+  labels: ['1 item', '2 items', '3 items', '4 items', '5 items', '6 items', '7 items', '9 items (full)'],
+  values: [10, 3, 1, 1, 1, 1, 1, 21],
+};
+
+const fieldCompletionData = [
+  { label: 'Price',         pct: 100, color: '#2d5a3d' },
+  { label: 'Garment Age',   pct: 100, color: '#2d5a3d' },
+  { label: 'How Acquired',  pct: 100, color: '#2d5a3d' },
+  { label: 'Wear Frequency',pct: 51,  color: '#f5a623' },
+  { label: 'Why Not Worn',  pct: 35,  color: '#f5a623' },
+  { label: 'Care Instructions', pct: 9, color: '#c8602e' },
+  { label: 'Repair History', pct: 8,  color: '#c8602e' },
+  { label: 'Future Plan',   pct: 2,   color: '#c8602e' },
+  { label: 'Why Discarded', pct: 2,   color: '#c8602e' },
+];
+
+// ─── HELPERS ───
+const defaults = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { labels: { font: { family: 'Arial', size: 11 }, boxWidth: 12 } } }
+};
+
+// ─── CHARTS ───
+
+// Ownership donut
+new Chart(document.getElementById('ownershipChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ownershipData.labels,
+    datasets: [{ data: ownershipData.values, backgroundColor: ownershipData.colors, borderWidth: 2, borderColor: '#fff' }]
+  },
+  options: { ...defaults, cutout: '58%', plugins: { ...defaults.plugins, legend: { position: 'bottom', labels: { font: { family: 'Arial', size: 11 }, boxWidth: 12, padding: 14 } } } }
+});
+
+// Rarely worn bar
+new Chart(document.getElementById('rarelyWornChart'), {
+  type: 'bar',
+  data: {
+    labels: rarelyWornData.labels,
+    datasets: [{ label: 'Rarely Worn', data: rarelyWornData.values, backgroundColor: '#f5a623', borderRadius: 4 }]
+  },
+  options: {
+    ...defaults,
+    indexAxis: 'y',
+    plugins: { ...defaults.plugins, legend: { display: false } },
+    scales: { x: { beginAtZero: true, ticks: { font: { family: 'Arial', size: 11 } } }, y: { ticks: { font: { family: 'Arial', size: 11 } } } }
+  }
+});
+
+// Discarded bar
+new Chart(document.getElementById('discardedChart'), {
+  type: 'bar',
+  data: {
+    labels: discardedData.labels,
+    datasets: [{ label: 'Discarded', data: discardedData.values, backgroundColor: '#c8602e', borderRadius: 4 }]
+  },
+  options: {
+    ...defaults,
+    indexAxis: 'y',
+    plugins: { ...defaults.plugins, legend: { display: false } },
+    scales: { x: { beginAtZero: true, ticks: { font: { family: 'Arial', size: 11 } } }, y: { ticks: { font: { family: 'Arial', size: 11 } } } }
+  }
+});
+
+// Inflow pie
+new Chart(document.getElementById('inflowChart'), {
+  type: 'doughnut',
+  data: {
+    labels: inflowData.labels,
+    datasets: [{ data: inflowData.values, backgroundColor: inflowData.colors, borderWidth: 2, borderColor: '#fff' }]
+  },
+  options: { ...defaults, cutout: '50%', plugins: { ...defaults.plugins, legend: { position: 'bottom', labels: { font: { family: 'Arial', size: 11 }, boxWidth: 10, padding: 10 } } } }
+});
+
+// Price bar
+new Chart(document.getElementById('priceChart'), {
+  type: 'bar',
+  data: {
+    labels: priceData.labels,
+    datasets: [{ data: priceData.values, backgroundColor: priceData.colors, borderRadius: 4 }]
+  },
+  options: {
+    ...defaults,
+    plugins: { ...defaults.plugins, legend: { display: false } },
+    scales: { x: { ticks: { font: { family: 'Arial', size: 11 } } }, y: { beginAtZero: true, ticks: { font: { family: 'Arial', size: 11 } } } }
+  }
+});
+
+// Age bar
+new Chart(document.getElementById('ageChart'), {
+  type: 'bar',
+  data: {
+    labels: ageData.labels,
+    datasets: [{ data: ageData.values, backgroundColor: ageData.colors, borderRadius: 4 }]
+  },
+  options: {
+    ...defaults,
+    plugins: { ...defaults.plugins, legend: { display: false } },
+    scales: { x: { ticks: { font: { family: 'Arial', size: 11 } } }, y: { beginAtZero: true, ticks: { font: { family: 'Arial', size: 11 } } } }
+  }
+});
+
+// Frequency donut
+new Chart(document.getElementById('frequencyChart'), {
+  type: 'doughnut',
+  data: {
+    labels: frequencyData.labels,
+    datasets: [{ data: frequencyData.values, backgroundColor: frequencyData.colors, borderWidth: 2, borderColor: '#fff' }]
+  },
+  options: { ...defaults, cutout: '55%', plugins: { ...defaults.plugins, legend: { position: 'bottom', labels: { font: { family: 'Arial', size: 12 }, boxWidth: 12, padding: 14 } } } }
+});
+
+// Why not wear donut
+new Chart(document.getElementById('whyNotWearChart'), {
+  type: 'doughnut',
+  data: {
+    labels: whyNotWearData.labels,
+    datasets: [{ data: whyNotWearData.values, backgroundColor: whyNotWearData.colors, borderWidth: 2, borderColor: '#fff' }]
+  },
+  options: { ...defaults, cutout: '52%', plugins: { ...defaults.plugins, legend: { position: 'bottom', labels: { font: { family: 'Arial', size: 11 }, boxWidth: 12, padding: 12 } } } }
+});
+
+// Completion bar chart
+new Chart(document.getElementById('completionChart'), {
+  type: 'bar',
+  data: {
+    labels: completionData.labels,
+    datasets: [{
+      data: completionData.values,
+      backgroundColor: completionData.values.map((v, i) => i === 7 ? '#2d5a3d' : (v >= 3 ? '#f5a623' : '#c8602e')),
+      borderRadius: 4
+    }]
+  },
+  options: {
+    ...defaults,
+    plugins: { ...defaults.plugins, legend: { display: false } },
+    scales: { x: { ticks: { font: { family: 'Arial', size: 11 } } }, y: { beginAtZero: true, ticks: { font: { family: 'Arial', size: 11 }, stepSize: 1 } } }
+  }
+});
+
+// ─── HEATMAP TABLE ───
+const tbody = document.getElementById('heatmapBody');
+function wearCell(v) {
+  if (v === 0) return `<td class="cell-0">—</td>`;
+  if (v >= 10) return `<td class="cell-high">${v}</td>`;
+  if (v >= 5) return `<td class="cell-2">${v}</td>`;
+  return `<td class="cell-1">${v}</td>`;
+}
+function rareCell(v) {
+  if (v === 0) return `<td class="cell-0">—</td>`;
+  if (v >= 8) return `<td class="cell-rare-high">${v}</td>`;
+  if (v >= 4) return `<td class="cell-rare-2">${v}</td>`;
+  return `<td class="cell-rare-1">${v}</td>`;
+}
+function discCell(v) {
+  if (v === 0) return `<td class="cell-0">—</td>`;
+  if (v >= 4) return `<td class="cell-disc-2">${v}</td>`;
+  return `<td class="cell-disc-1">${v}</td>`;
+}
+
+heatmapData.forEach(row => {
+  const total = row.wearOften + row.rarelyWear + row.discarded + row.neverOwned;
+  tbody.innerHTML += `
+    <tr>
+      <td>${row.name}</td>
+      ${wearCell(row.wearOften)}
+      ${rareCell(row.rarelyWear)}
+      ${discCell(row.discarded)}
+      <td style="color:#999; font-size:12px;">${row.neverOwned}</td>
+      <td style="font-weight:600; color:#666; font-size:12px;">${total}</td>
+    </tr>`;
+});
+
+// ─── FIELD COMPLETION BARS ───
+const fcWrap = document.getElementById('fieldCompletion');
+fieldCompletionData.forEach(f => {
+  fcWrap.innerHTML += `
+    <div class="comp-bar-label"><span>${f.label}</span><span style="font-weight:700;color:${f.color}">${f.pct}%</span></div>
+    <div class="comp-bar-outer"><div class="comp-bar-inner" style="width:${f.pct}%;background:${f.color};"></div></div>`;
+});
+</script>
+</body>
+</html>
